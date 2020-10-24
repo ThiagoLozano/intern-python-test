@@ -92,3 +92,6 @@ import pandas as pd
 import csv
 import json
 ```
+
+### Gráfico da Quantidade pedida de cada Produto.
+![Quantidade_Produtos](https://github.com/ThiagoLozano/intern-python-test/blob/main/gerados/Gr%C3%A1ficos/Quantidade_Produtos.png)
