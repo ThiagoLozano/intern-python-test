@@ -27,7 +27,7 @@ class Graficos:
         plt.xlabel('Produtos', fontdict={'fontsize': 13})
         plt.ylabel('Quantidade Pedida', fontdict={'fontsize': 13})
 
-        # Apaga aos axes do Top e da Direita.
+        # Apaga os axes do Top e da Direita.
         for axis in ['top', 'right']:
             ax.spines[axis].set_color(None)
 
