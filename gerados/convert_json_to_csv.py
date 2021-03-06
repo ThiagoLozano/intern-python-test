@@ -1,55 +1,41 @@
-# Importa a Biblioteca Pandas CSV.
-import pandas as pd
 import csv
+import json
 
 
-class Conversor:
+class ConversorJSON:
     # Método Construtor.
     def __init__(self):
-        self.arquivo_json = pd.read_json('shopping.json')
-        self.contador = 0
-        self.total = 0
+        try:
+            with open("shopping.json") as f:
+                self.pedidos = json.load(f)
+            self.Converter_para_CSV()
+        except Exception as erro:
+            print("Erro: {}".format(erro))
 
-    # Função que cria a coluna 'total' e inseri o valor total de cada produto.
-    def Criar_Coluna_Total(self):
+    # Método que converte para CSV.
+    def Converter_para_CSV(self):
+        # Lista que armazena os valor total de cada pedido.
+        values = []
 
-        # Atribui o arquivo com a chave principal em uma variável 'arq'.
-        arq = self.arquivo_json['order']
-
-        # Contador de linhas.
-        for c in arq:
-            self.contador += 1
-
-        # Inseri o valor total de cada produto.
-        for c in range(self.contador):
-            arq[c]['total'] = arq[c]['quantity'] * arq[c]['value']
-
-        # Chama a função 'Converter_para_CSV'.
-        self.Converter_para_CSV(arq)
-
-    # Função que cria um arquivo CSV com os valores do JSON.
-    def Converter_para_CSV(self, arq):
-
-        # Faz a soma de todos os valores totais.
-        for c in range(self.contador):
-            self.total += arq[c]['total']
-
-        # Cria um arquivo CSV.
-        with open('resultado.csv', 'w') as arquivo_csv:
-            columns = ['id', 'name', 'description', 'quantity', 'value', 'total']
-            escrever = csv.DictWriter(arquivo_csv, fieldnames=columns, delimiter='|', lineterminator='\n')
+        with open("result_json_to_csv.csv", "w") as f:
+            columns = ['ID', 'Name', 'Description', 'Quantity', 'Value', 'Total']
+            escrever = csv.DictWriter(f, fieldnames=columns, delimiter='|', lineterminator='\n')
             escrever.writeheader()
 
-            # Inseri os valores em cada linha do CSV.
-            for v in range(self.contador):
-                escrever.writerow(arq[v])
-
-            # Escreve por último a linha 'Total'.
+            # Pega cada objeto do pedido e inseri no CSV.
+            for pedido in self.pedidos['order']:
+                id_order = pedido['id']
+                name = pedido['name']
+                description = pedido['description']
+                quantity = pedido['quantity']
+                value = pedido['value']
+                total_order = value * quantity
+                values.append(total_order)
+                escrever.writerow(
+                    {'ID': id_order, 'Name': name, 'Description': description, 'Quantity': quantity, 'Value': value,
+                     'Total': total_order})
             escrever.writerow(
-                {'id': 'Total', 'name': '', 'description': '', 'quantity': '', 'value': '', 'total': self.total})
-
-        print("Convertido com sucesso!")
+                {'ID': 'Total', 'Name': '', 'Description': '', 'Quantity': '', 'Value': '', 'Total': sum(values)})
 
 
-usuario = Conversor()
-usuario.Criar_Coluna_Total()
+usuario = ConversorJSON()
