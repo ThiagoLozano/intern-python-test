@@ -2,44 +2,39 @@ import csv
 import json
 
 
-class Conversor:
+class ConversorCSV:
     # Método Construtor.
     def __init__(self):
-        self.arquivo_csv = 'shopping.csv'
-        self.arquivo_json = 'resultado.json'
-        self.soma_total = 0
+        try:
+            with open("shopping.csv", 'r', encoding='utf_8') as f:
+                self.pedidos = csv.reader(f, delimiter='|')
+                next(self.pedidos)
+                self.Converter_para_JSON()
+        except Exception as erro:
+            print("Erro: {}".format(erro))
+            exit(0)
 
+    # Método que converte em JSON.
     def Converter_para_JSON(self):
-        # Abre para leitura o arquivo CSV.
-        with open(self.arquivo_csv, 'r', encoding='utf-8') as arq_csv:
-            # Faz a leitura sem o caracter '|'.
-            leitor = csv.reader(arq_csv, delimiter='|')
+        # Cria um Dicionário que armazena os pedidos.
+        dados = {"order": []}
 
-            # 'Pula' a primeira linha.
-            next(leitor)
+        # Cria uma lista que armazena os valores de cada pedido.
+        valores = []
 
-            # Cria um dicionário com a lista de pedidos(order).
-            dados = {"order": []}
-
-            # Passa pelas linhas do arquivo.
-            for c in leitor:
-
-                # Multiplica a Quantidade(Quantity) pelo Valor(Value) e soma com o próximo.
-                self.soma_total += float(c[3]) * float(c[4])
-
-                # Adiciona os valor de cada coluna nas linhas correspondentes.
-                dados['order'].append(
-                    {"ID": c[0], "Name": c[1], "Description": c[2], "Quantity": c[3], "Value": c[4]})
-                dados['Total'] = self.soma_total
-
-        # Cria um arquivo JSON.
-        with open(self.arquivo_json, 'w', encoding='utf-8') as arq_json:
-            # Faz um dump dos dados dentro do arquivo criado.
-            # Faz uma identação com uma correção da liguagem.
-            json.dump(dados, arq_json, ensure_ascii=False, indent=4)
-
-        print('Convertido com sucesso!')
+        for pedido in self.pedidos:
+            # Cria o total de cada pedido.
+            total_order = float(pedido[3]) * float(pedido[4])
+            valores.append(total_order)
+            
+            # Inseri no dicionário.
+            dados['order'].append({"ID": pedido[0], "Name": pedido[1], "Description": pedido[2], "Quantity": pedido[3],
+                                   "Value": pedido[4], "Total": str(total_order)})
+            dados['Total'] = sum(valores)
+        
+        # Cria o JSON.
+        with open("result_csv_to_json.json", "w") as f:
+            json.dump(dados, f, ensure_ascii=False, indent=4)
 
 
-usuario = Conversor()
-usuario.Converter_para_JSON()
+usuario = ConversorCSV()
